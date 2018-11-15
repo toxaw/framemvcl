@@ -1,0 +1,61 @@
+<?php
+namespace Framework\Library;
+
+class Hook
+{
+	private static $hooks = array(), $trigClosedAdd = false;
+
+	public static function addReplace($path, $callback)
+	{
+		if(!self::$trigClosedAdd)
+		{
+			if(!array_key_exists($path, self::$hooks))
+			{
+				self::$hooks[$path] = array('type'=> 1,
+											'callback' => $callback);
+			}
+			else
+			{
+				(new \Framework\SysError())->error(17, array($path));
+			}
+		}
+	}
+
+	public static function addReturn($path, $callback)
+	{
+		if(!self::$trigClosedAdd)
+		{
+			if(!array_key_exists($path, self::$hooks))
+			{
+				self::$hooks[$path] = array('type'=> 2,
+											'callback' => $callback);
+			}
+			else
+			{
+				(new \Framework\SysError())->error(17, array($path));
+			}
+		}
+	}
+
+	public static function typeHook($path)
+	{
+		if(array_key_exists($path, self::$hooks))
+		{
+			return self::$hooks[$path]['type'];
+		}
+		else 
+			return 0;
+	}		
+
+	public static function hook($path, $data = array())
+	{
+		$callback  = self::$hooks[$path]['callback'];
+
+		return $callback($data);
+	}
+
+	public static function closedAdd()
+	{
+		self::$trigClosedAdd = true;
+	}
+}
