@@ -3,6 +3,6 @@
 {
 	public function index($data = array())
 	{
-		
+		//echo "lol<br>";
 	}
 }

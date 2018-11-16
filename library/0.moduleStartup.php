@@ -10,6 +10,8 @@ class LibraryModuleStartup extends Library
         $callback_privatePath = function ($args)
         {
         	$args['local']['router_config']['private_path'][]='startup\/.+';
+
+            $args['local']['router_config']['private_path'][]='startup';
         	
         	if(!file_exists(P_C.'/startup.php'))
 	        {

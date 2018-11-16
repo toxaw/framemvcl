@@ -19,7 +19,9 @@ namespace Framework;
 
     		$libName = implode(".", $libName);
 
-    		$key = $libName;		
+            $libName = preg_replace('/^[0-9]{1,}\./ui', '', $libName);
+    		
+            $key = $libName;		
 
     		if(class_exists($libNameFull = 'Framework\Library\Library'.ucfirst($libName)))
     		{

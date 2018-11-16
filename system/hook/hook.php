@@ -3,15 +3,20 @@ namespace Framework\Library;
 
 class Hook
 {
-	private static $key = '', $args = array(), $newArgs = array(), $hooks = array(), $trigClosedAdd = false;
+	private static $key = '', $args = array(), $newArgs = array(), $hooks = array(), $trigClosedAdd = false, $before = true;
 
 	public static function addInfo($backtrace, $defined_vars, $before)
-	{ 
+	{
 		self::$key = self::genKey($backtrace);
 
 		if(!self::is(self::$key)) return false;
-	
-		if(!(self::isB(self::$key)==$before)) return false;
+		
+		if(!self::isB(self::$key) && $before) return false;
+		//echo '<pre>';
+		//print_r(self::$hooks[self::$key]);
+		//echo(self::$key.' '.self::isB(self::$key));
+
+		self::$before = $before;
 
 		self::$args['local'] = array();
 
@@ -33,15 +38,24 @@ class Hook
 
 		self::$newArgs['property'] = array();
 		
-		$callback = self::$hooks[self::$key]['callback'];
+		$args = self::$args;
 
-		$newArgs = $callback(self::$args);
+		foreach (self::getCallBacks(self::$key, false, self::$before) as $callback)
+		{
+
+			$args = $callback($args);
+		}
+		
+		foreach (self::getCallBacks(self::$key, true, self::$before) as $callback)
+		{
+			$args = $callback($args);
+		}
 
 		if(isset($newArgs['local']))
-			self::$newArgs['local']  = $newArgs['local'];
+			self::$newArgs['local'] = $args['local'];
 
 		if(isset($newArgs['property']))
-			self::$newArgs['property']  = $newArgs['property'];
+			self::$newArgs['property'] = $args['property'];
 	}
 
 	public static function getLocal()
@@ -66,6 +80,7 @@ class Hook
 
 		self::$newArgs = array();
 
+		self::$before = true;
 	}
 
 	private static function genKey($backtrace)
@@ -85,16 +100,9 @@ class Hook
 	{
 		if(!self::$trigClosedAdd)
 		{
-			if(!array_key_exists($path, self::$hooks))
-			{
-				self::$hooks[$path] = array('r'=> false,
+				self::$hooks[$path][] = array('r'=> false,
 											'b' => false,
 											'callback' => $callback);
-			}
-			else
-			{
-				(new \Framework\SysError())->error(17, array($path));
-			}
 		}
 	}
 
@@ -102,16 +110,9 @@ class Hook
 	{
 		if(!self::$trigClosedAdd)
 		{
-			if(!array_key_exists($path, self::$hooks))
-			{
-				self::$hooks[$path] = array('r'=> true,
+				self::$hooks[$path][] = array('r'=> true,
 											'b' => false,
 											'callback' => $callback);
-			}
-			else
-			{
-				(new \Framework\SysError())->error(17, array($path));
-			}
 		}
 	}
 
@@ -119,16 +120,9 @@ class Hook
 	{
 		if(!self::$trigClosedAdd)
 		{
-			if(!array_key_exists($path, self::$hooks))
-			{
-				self::$hooks[$path] = array('r'=> false,
+				self::$hooks[$path][] = array('r'=> false,
 											'b' => true,
 											'callback' => $callback);
-			}
-			else
-			{
-				(new \Framework\SysError())->error(17, array($path));
-			}
 		}
 	}
 
@@ -136,16 +130,9 @@ class Hook
 	{
 		if(!self::$trigClosedAdd)
 		{
-			if(!array_key_exists($path, self::$hooks))
-			{
-				self::$hooks[$path] = array('r'=> true,
+				self::$hooks[$path][] = array('r'=> true,
 											'b' => true,
 											'callback' => $callback);
-			}
-			else
-			{
-				(new \Framework\SysError())->error(17, array($path));
-			}
 		}
 	}
 
@@ -155,9 +142,15 @@ class Hook
 
 		if(!self::is($key)) return false;
 
-		if(!(self::isB($key)==$before)) return false;
-		
-		return self::$hooks[$key]['r'];
+		if(!self::isB($key) && $before) return false;
+
+		for($i=0;$i<count(self::$hooks[$key]);$i++)
+		{
+			if(self::$hooks[$key][$i]['r'])
+				return true;			
+		}
+
+		return false;
 	}		
 
 	private static function is($key)
@@ -170,12 +163,33 @@ class Hook
 
 	private static function isB($key)
 	{
-		return self::$hooks[$key]['b'];
+
+		for($i=0;$i<count(self::$hooks[$key]);$i++)
+		{
+			if(self::$hooks[$key][$i]['b'])
+				return true;		
+		}
+
+		return false;
 	}
 
 	public static function closedAdd()
 	{
 		self::$trigClosedAdd = true;
+	}
+
+	private static function getCallBacks($key, $return, $before)
+	{
+		$callBacks = array();
+		//echo "<pre>";print_r(self::$hooks[$key]);echo('|'.$return.'|'.$before.'|<br>');
+		for($i=0;$i<count(self::$hooks[$key]);$i++)
+		{
+			if(self::$hooks[$key][$i]['r']==$return && self::$hooks[$key][$i]['b']==$before)
+				{$callBacks[] = self::$hooks[$key][$i]['callback'];	}
+			
+		}
+
+		return $callBacks;
 	}
 
 }
