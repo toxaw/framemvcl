@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Library;
 
-class LibraryModuleStartup extends Library 
+class LibraryModuleInstaller extends Library 
 {
 	public function __construct()
     {
