@@ -235,12 +235,14 @@ class Router
                 {
                     if(method_exists("{$controllerName}", "{$method}") && (new \ReflectionMethod("{$controllerName}", "{$method}"))->isPublic())
                     {
+                        $ControllerReturn = "";
+
                         ob_start();
                         
                         if($arrParam)
-                            (new $controllerName())->$method($arrParam);
+                        	$ControllerReturn = (new $controllerName())->$method($arrParam);
                         else
-                            (new $controllerName())->$method();
+                            $ControllerReturn = (new $controllerName())->$method();
                         
                         $content = ob_get_contents();
                         
@@ -248,7 +250,7 @@ class Router
 
         				if(include(H_AT)) return include(H_A);include(H_A);                        
                         
-                        return array('run' => 1, 'content' => $content);
+                        return array('run' => 1, 'content' => $ControllerReturn?$ControllerReturn:$content);
                     }
                 }
             }

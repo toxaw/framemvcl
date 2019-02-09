@@ -50,6 +50,6 @@ class ControllerCommonUserMenu extends Controller
         
         $this->data['link_logout'] = $this->tools->getLink('login/logout');
 
-        $this->view('common/user_menu'); 
+        $this->view('common/user_menu');
     }
 }

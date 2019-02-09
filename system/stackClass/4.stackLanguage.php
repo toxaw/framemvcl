@@ -34,7 +34,14 @@ class StackLanguage extends StackObject
         
         /*проверка на уникальность в массиве*/
         if(array_key_exists($regenKey, $this->objects))
-            $this->error->error(9, array($key)); 
+        {
+            if(ONE_LANGUAGE)
+            {
+                $this->error->error(9, array($key)); 
+            }
+            else
+                return;
+        } 
             
         // генерация пути подключения с проверкой
         $pathFile = P_L.'/'.$key.'.php';

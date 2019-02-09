@@ -46,6 +46,11 @@ define("P_L", P_WORK.'/language');
 
 define("P_V", P_WORK.'/view');
 
+//Stack->config
+define("ONE_MODEL", false);
+
+define("ONE_LANGUAGE", false);
+
 //Router->config
 $router_config['private_path'] = array('common\/.+');
 

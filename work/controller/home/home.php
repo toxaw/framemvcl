@@ -21,7 +21,7 @@ class ControllerHomeHome extends Controller
         $data_menu['route_active'] = $this->tools->getNowRoute();
 
         $this->data['menu'] = $this->tools->loadController('common/userMenu', $data_menu);
-        
+
         $this->data['footer'] = $this->tools->loadController('common/footer');
         
         //$this->view('home/purpose_vk_client');

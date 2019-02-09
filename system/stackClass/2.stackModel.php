@@ -20,11 +20,18 @@ class StackModel extends StackObject
 
         /*преобразование ключа*/
         $regenKey = $this->regenKey($key);
-        
+
         /*проверка на уникальность в массиве*/
         if(array_key_exists($regenKey, $this->objects))
-            $this->error->error(3, array($key)); 
-            
+        {
+            if(ONE_MODEL)
+            {
+                $this->error->error(3, array($key)); 
+            }
+            else
+                return;
+        }
+
         // генерация пути подключения с проверкой
         $classPath = explode('/', $key);
 
@@ -38,14 +45,20 @@ class StackModel extends StackObject
         if(file_exists($pathFile))
         {
             if(class_exists($className))
-            {
-                $this->error->error(11, array($className));
+            {   
+                if(ONE_MODEL)
+                {
+                    $this->error->error(11, array($className));
+                }
             }
 
             if(include(H_AT)) return include(H_A);include(H_A);
-                                    
-            include($pathFile);
-            
+             
+            if(!class_exists($className))
+            {                        
+                include($pathFile);
+            }
+                
             if(class_exists($className))
             {
                 if(get_parent_class($className) != "Model")
